@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Passive node that replaces disabling strike in the Ravager tree (level 2, after savage psychic slice or savage
+	     style; spin cut follows it). Sentinel Framework's Ability_PassiveGiver gives the hediff below on unlock and again on load. -->
+	<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+		<defName>RavagerReimagined_DisablingStrikes</defName>
+		<label>disabling strikes</label>
+		<description>Evolving passive:\n\nEvery hit from a Ravager psycast has a 20% chance to leave the target with a stack of ravaged nerves (+1% pain per stack; stacks fade over time).\n\nEvolution requirement: know every Ravager psycast.\n\nEvolution effect: every hit also has a 10% chance to leave a stack of ravaged armor (-10% worn armor effectiveness per stack, up to 5 stacks; stacks fade over time).</description>
+		<iconPath>UI/Abilities/Ravager/AAVPE_DisablingStrike</iconPath>
+		<abilityClass>SentinelFramework_STNL.Ability_PassiveGiver</abilityClass>
+		<targetMode>Self</targetMode>
+		<chance>0</chance>
+		<castTime>30</castTime>
+		<range>0</range>
+		<modExtensions>
+			<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+				<path>AAVPE_Ravager</path>
+				<level>2</level>
+				<order>3</order>
+				<psyfocusCost>0</psyfocusCost>
+				<entropyGain>0</entropyGain>
+				<prerequisites>
+					<li>AAVPE_Slice</li>
+					<li>RavagerReimagined_SavageStyle</li>
+				</prerequisites>
+			</li>
+			<li Class="SentinelFramework_STNL.Ability_PassiveModExt">
+				<hediffsToAdd>
+					<li>RavagerReimagined_DisablingStrikesPassive</li>
+				</hediffsToAdd>
+			</li>
+		</modExtensions>
+	</VEF.Abilities.AbilityDef>
+
+	<!-- The caster's marker. Shows evolution progress; the chances and stack sizes live in its extension. -->
+	<HediffDef>
+		<defName>RavagerReimagined_DisablingStrikesPassive</defName>
+		<label>disabling strikes</label>
+		<description>This psycaster's Ravager strikes can tear at the target's nerves.</description>
+		<hediffClass>RavagerReimagined.Hediff_DisablingStrikes</hediffClass>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<everCurableByItem>false</everCurableByItem>
+		<keepOnBodyPartRestoration>true</keepOnBodyPartRestoration>
+		<makesSickThought>false</makesSickThought>
+		<modExtensions>
+			<li Class="RavagerReimagined.DisablingStrikesExtension">
+				<nervesHediff>RavagerReimagined_RavagedNerves</nervesHediff>
+				<nervesChance>0.2</nervesChance>
+				<nervesStacks>1</nervesStacks>
+				<!-- Defined in 1.7/Defs only: it uses Sentinel Framework's worn-armor stat, which Sentinel's 1.6 build lacks.
+				     Looked up by name, so on 1.6 the evolution effect is simply absent. -->
+				<armorHediff>RavagerReimagined_RavagedArmor</armorHediff>
+				<armorChance>0.1</armorChance>
+				<armorStacks>1</armorStacks>
+			</li>
+		</modExtensions>
+	</HediffDef>
+
+	<!-- On the target: +1% pain per stack (severity = stacks). Fades one stack every 4 hours. -->
+	<HediffDef>
+		<defName>RavagerReimagined_RavagedNerves</defName>
+		<label>ravaged nerves</label>
+		<description>Psychic strikes have frayed this creature's nerves, leaving lingering pain that fades over time. Each stack adds 1% pain.</description>
+		<hediffClass>RavagerReimagined.Hediff_RavagedNerves</hediffClass>
+		<defaultLabelColor>(0.8, 0.35, 0.35)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<minSeverity>0</minSeverity>
+		<maxSeverity>100</maxSeverity>
+		<isBad>true</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<makesSickThought>false</makesSickThought>
+		<comps>
+			<li Class="HediffCompProperties_SeverityPerDay">
+				<severityPerDay>-6</severityPerDay>
+			</li>
+		</comps>
+		<modExtensions>
+			<li Class="RavagerReimagined.RavagedNervesExtension">
+				<painPerStack>0.01</painPerStack>
+			</li>
+		</modExtensions>
+	</HediffDef>
+
+</Defs>

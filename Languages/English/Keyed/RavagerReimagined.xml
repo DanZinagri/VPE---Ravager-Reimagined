@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+	<!-- Text over the target for savage blow (fatal blow's def; Alpha Animals reused spin cut's text). -->
+	<RavagerReimagined_FatalBlow>Savage blow!</RavagerReimagined_FatalBlow>
+	<RavagerReimagined_FatalBlowFailed>Savage blow failed</RavagerReimagined_FatalBlowFailed>
+
+	<RavagerReimagined_RavagerHunger>Ravager hunger!</RavagerReimagined_RavagerHunger>
+	<RavagerReimagined_RavagerHungerFailed>Ravager hunger failed</RavagerReimagined_RavagerHungerFailed>
+
+</LanguageData>

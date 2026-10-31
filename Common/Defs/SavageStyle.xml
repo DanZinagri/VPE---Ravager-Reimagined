@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Level 1, beside savage psychic slice; leads into claw frenzy and the disabling strikes passive. Knowing it gives
+	     the permanent passive below (Ability_SavageStyle adds it on learning and again on load); casting it gives the
+	     savage fury buff for durationTime (4 hours) through VEF's AbilityExtension_Hediff. Cooldown 6 hours. -->
+	<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+		<defName>RavagerReimagined_SavageStyle</defName>
+		<label>savage style</label>
+		<description>Passive: while fighting unarmed, the caster's unarmed attacks deal +150% damage and gain +20% armor penetration.\n\nActive: the caster works itself into a savage fury, adding a further +150% unarmed damage for 4 hours.</description>
+		<iconPath>UI/Abilities/RavagerReimagined/RavagerReimagined_SavageStyle</iconPath>
+		<abilityClass>RavagerReimagined.Ability_SavageStyle</abilityClass>
+		<targetMode>Self</targetMode>
+		<range>0</range>
+		<castTime>15</castTime>
+		<cooldownTime>15000</cooldownTime>
+		<durationTime>10000</durationTime>
+		<castSound>AA_ClawFrenzyPsycast</castSound>
+		<modExtensions>
+			<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+				<path>AAVPE_Ravager</path>
+				<level>1</level>
+				<order>2</order>
+				<psyfocusCost>0.02</psyfocusCost>
+				<entropyGain>10</entropyGain>
+			</li>
+			<li Class="VEF.Abilities.AbilityExtension_Hediff">
+				<hediff>RavagerReimagined_SavageFury</hediff>
+				<applyToCaster>true</applyToCaster>
+			</li>
+			<li Class="RavagerReimagined.SavageStyleExtension">
+				<passive>RavagerReimagined_SavageStylePassive</passive>
+			</li>
+		</modExtensions>
+	</VEF.Abilities.AbilityDef>
+
+	<!-- Unarmed = an attack not made with equipment while no weapon is held (Source/SavageStyle.cs). The damage stat
+	     multiplies, so the passive (+1.5) and the buff (+1.5) together make unarmed attacks deal 4x. -->
+	<HediffDef>
+		<defName>RavagerReimagined_SavageStylePassive</defName>
+		<label>savage style</label>
+		<description>This psycaster fights like a beast when unarmed: unarmed attacks hit much harder and pierce armor more easily.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<everCurableByItem>false</everCurableByItem>
+		<keepOnBodyPartRestoration>true</keepOnBodyPartRestoration>
+		<makesSickThought>false</makesSickThought>
+		<stages>
+			<li>
+				<statOffsets>
+					<RavagerReimagined_UnarmedDamage>1.5</RavagerReimagined_UnarmedDamage>
+					<RavagerReimagined_UnarmedArmorPenetration>0.2</RavagerReimagined_UnarmedArmorPenetration>
+				</statOffsets>
+			</li>
+		</stages>
+	</HediffDef>
+
+	<HediffDef>
+		<defName>RavagerReimagined_SavageFury</defName>
+		<label>savage fury</label>
+		<description>A psychically fed fury. Unarmed attacks hit far harder until it fades.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<defaultLabelColor>(1, 0.55, 0.3)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<makesSickThought>false</makesSickThought>
+		<comps>
+			<li Class="HediffCompProperties_Disappears">
+				<disappearsAfterTicks>10000</disappearsAfterTicks>
+				<showRemainingTime>true</showRemainingTime>
+			</li>
+		</comps>
+		<stages>
+			<li>
+				<statOffsets>
+					<RavagerReimagined_UnarmedDamage>1.5</RavagerReimagined_UnarmedDamage>
+				</statOffsets>
+			</li>
+		</stages>
+	</HediffDef>
+
+	<StatDef>
+		<defName>RavagerReimagined_UnarmedDamage</defName>
+		<label>unarmed damage</label>
+		<description>A multiplier on the damage of unarmed melee attacks, used only while no weapon is held.</description>
+		<category>PawnCombat</category>
+		<defaultBaseValue>1</defaultBaseValue>
+		<minValue>0</minValue>
+		<toStringStyle>PercentZero</toStringStyle>
+		<hideAtValue>1</hideAtValue>
+		<displayPriorityInCategory>4000</displayPriorityInCategory>
+	</StatDef>
+
+	<StatDef>
+		<defName>RavagerReimagined_UnarmedArmorPenetration</defName>
+		<label>unarmed armor penetration</label>
+		<description>Extra armor penetration added to unarmed melee attacks, used only while no weapon is held.</description>
+		<category>PawnCombat</category>
+		<defaultBaseValue>0</defaultBaseValue>
+		<toStringStyle>PercentZero</toStringStyle>
+		<hideAtValue>0</hideAtValue>
+		<displayPriorityInCategory>3999</displayPriorityInCategory>
+	</StatDef>
+
+</Defs>

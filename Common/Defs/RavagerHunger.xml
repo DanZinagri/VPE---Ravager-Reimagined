@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Level 4, between ravager instinct and EMP blow; unlocked by skewer. A scaled 30-damage bite
+	     (Ability_RavagerStrike, so Melee x psychic sensitivity scaling and disabling strikes apply). Biting
+	     a flesh creature also feeds the caster 1 nutrition and gives it the sated buff below (FeedOnHitExtension).
+	     Cooldown 6 hours. -->
+	<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+		<defName>RavagerReimagined_RavagerHunger</defName>
+		<label>ravager hunger</label>
+		<description>The caster sinks its teeth into the target in a psychically fed frenzy. Biting a living creature of flesh sates the caster as if it had just eaten a full meal, and for 12 hours afterwards its wounds heal 50% faster and bleed half as fast.</description>
+		<iconPath>UI/Abilities/RavagerReimagined/RavagerReimagined_RavagerHunger</iconPath>
+		<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+		<targetMode>Pawn</targetMode>
+		<range>1.9</range>
+		<targetingParameters>
+			<canTargetPawns>true</canTargetPawns>
+			<canTargetSelf>false</canTargetSelf>
+			<canTargetBuildings>false</canTargetBuildings>
+		</targetingParameters>
+		<castTime>10</castTime>
+		<cooldownTime>15000</cooldownTime>
+		<castSound>AA_ClawFrenzyPsycast</castSound>
+		<modExtensions>
+			<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+				<path>AAVPE_Ravager</path>
+				<level>4</level>
+				<order>2</order>
+				<psyfocusCost>0.2</psyfocusCost>
+				<entropyGain>30</entropyGain>
+				<prerequisites>
+					<li>AAVPE_Skewer</li>
+				</prerequisites>
+			</li>
+			<li Class="RavagerReimagined.RavagerStrikeExtension">
+				<damageDef>Bite</damageDef>
+				<damage>30</damage>
+				<armorPenetration>0.3</armorPenetration>
+				<repeatAmount>1</repeatAmount>
+				<mote>RavagerReimagined_RavagerHunger</mote>
+				<moteFailed>RavagerReimagined_RavagerHungerFailed</moteFailed>
+			</li>
+			<li Class="RavagerReimagined.FeedOnHitExtension">
+				<nutrition>1</nutrition>
+				<buff>RavagerReimagined_RavagerSated</buff>
+			</li>
+		</modExtensions>
+	</VEF.Abilities.AbilityDef>
+
+	<!-- On the caster: injuries heal 50% faster (InjuryHealingFactor) and total bleeding is halved (totalBleedFactor,
+	     the same stage field vanilla uses for bleed-slowing effects). Lasts 12 hours; biting again refreshes it. -->
+	<HediffDef>
+		<defName>RavagerReimagined_RavagerSated</defName>
+		<label>ravager sated</label>
+		<description>Freshly fed on a living creature. Wounds heal faster and bleed less.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<defaultLabelColor>(1, 0.55, 0.3)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<makesSickThought>false</makesSickThought>
+		<comps>
+			<li Class="HediffCompProperties_Disappears">
+				<disappearsAfterTicks>30000</disappearsAfterTicks>
+				<showRemainingTime>true</showRemainingTime>
+			</li>
+		</comps>
+		<stages>
+			<li>
+				<totalBleedFactor>0.5</totalBleedFactor>
+				<statFactors>
+					<InjuryHealingFactor>1.5</InjuryHealingFactor>
+				</statFactors>
+			</li>
+		</stages>
+	</HediffDef>
+
+</Defs>

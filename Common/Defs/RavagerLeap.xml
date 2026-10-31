@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- The flyer for leaping Ravager strikes (leaping charge, spin cut) and leaping charge's leap back. Same flight
+	     values as Alpha Animals' AAVPE_JumpingPawn; RavagerLeap resolves the strike on landing. -->
+	<ThingDef ParentName="PawnFlyerBase">
+		<defName>RavagerReimagined_RavagerLeap</defName>
+		<thingClass>RavagerReimagined.RavagerLeap</thingClass>
+		<pawnFlyer>
+			<flightDurationMin>0.1</flightDurationMin>
+			<flightSpeed>20</flightSpeed>
+		</pawnFlyer>
+	</ThingDef>
+
+</Defs>

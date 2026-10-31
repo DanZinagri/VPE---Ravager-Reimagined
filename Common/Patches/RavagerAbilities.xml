@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Ravager path, taken over from Alpha Animals (1.7/Mods/VanillaPsycastsExpanded/Defs/AbilityDefs/Ravager.xml,
+     identical in its 1.6 folder). Each ability is replaced whole, under Alpha Animals' own defName, so the
+     AAVPE_Ravager path and other mods' per-ability settings (Psycasts²) keep working. Every attack runs on this mod's
+     own RavagerReimagined.Ability_RavagerStrike (Source/Ability_RavagerStrike.cs), not Alpha Animals' code; only their
+     art, sounds and text keys are used. Not compatible with ongoing saves whose pawns already know Ravager psycasts.
+     Every value for these psycasts is set here; Alpha Animals' later edits to them do not come through.
+     Generated 2026-10-28 from Alpha Animals' XML; the comment above each ability says what differs from theirs.
+
+     Tree (level: order, after):
+       1: slice (1), savage style (2, Common/Defs/SavageStyle.xml)
+       2: claw frenzy (1, slice or savage style), disabling strikes passive (3, slice or savage style;
+          Common/Defs/DisablingStrikes.xml)
+       3: skewer (1, claw frenzy), leaping charge (2, claw frenzy), spin cut (3, disabling strikes)
+       4: ravager instinct (1, charge and skewer's defName; leaping charge or skewer), ravager hunger (2, skewer;
+          Common/Defs/RavagerHunger.xml), EMP blow (3, spin cut)
+       5: savage blow (1, fatal blow's defName; ravager instinct), KO (3, EMP blow)
+     VPE lays a row out by count, sorted by order. A prerequisite list means "any one of these" (VPE's
+     AbilityExtension_Psycast.PrereqsCompleted). -->
+<Patch>
+
+	<!-- savage psychic slice: cast time quartered (120 -> 30). -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Slice"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_Slice</defName>
+				<label>savage psychic slice</label>
+				<description>Teleport a short distance to a target and slice a random body part.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_Slice</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>5</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>30</castTime>
+				<cooldownTime>1000</cooldownTime>
+				<castSound>AA_SlicePsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>1</level>
+						<order>1</order>
+						<psyfocusCost>0.05</psyfocusCost>
+						<entropyGain>10</entropyGain>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>20</damage>
+						<armorPenetration>.6</armorPenetration>
+						<teleport>true</teleport>
+						<mote>AA_PsychicSlice</mote>
+						<moteFailed>AA_PsychicSliceFailed</moteFailed>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- claw frenzy: description reworded (no weapon); also unlocked by savage style; cooldown halved (1000 -> 500). -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_ClawFrenzy"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_ClawFrenzy</defName>
+				<label>claw frenzy</label>
+				<description>Envelopes the caster's hands in terrifyingly sharp psychic claws, striking the target with three consecutive ferocious attacks. Only usable on melee range.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_ClawFrenzy</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>1.9</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>500</cooldownTime>
+				<castSound>AA_ClawFrenzyPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>2</level>
+						<order>1</order>
+						<psyfocusCost>0.075</psyfocusCost>
+						<entropyGain>30</entropyGain>
+						<prerequisites>
+							<li>AAVPE_Slice</li>
+							<li>RavagerReimagined_SavageStyle</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Scratch</damageDef>
+						<damage>10</damage>
+						<armorPenetration>.3</armorPenetration>
+						<repeatAmount>3</repeatAmount>
+						<mote>AA_ClawFrenzy</mote>
+						<moteFailed>AA_ClawFrenzyFailed</moteFailed>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- skewer: a normal hit on a random part (no longer torso only, so animals and mechanoids can be targeted) that
+	     always leaves a bleeding wound (BleedingWoundExtension); cooldown doubled (1000 -> 2000). -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Skewer"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_Skewer</defName>
+				<label>skewer</label>
+				<description>Psychically charges the caster with an obscene amount of energy, skewering the target and dealing immense damage. The wound always bleeds: if armor turns the blow, the target is still left with a bleeding stab wound.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_Skewer</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>1.9</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>2000</cooldownTime>
+				<castSound>AA_SkewerPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>3</level>
+						<order>1</order>
+						<psyfocusCost>0.1</psyfocusCost>
+						<entropyGain>50</entropyGain>
+						<prerequisites>
+							<li>AAVPE_ClawFrenzy</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Stab</damageDef>
+						<damage>30</damage>
+						<armorPenetration>.9</armorPenetration>
+						<repeatAmount>1</repeatAmount>
+						<mote>AA_Skewer</mote>
+						<moteFailed>AA_SkewerFailed</moteFailed>
+					</li>
+					<!-- Only used when the hit itself left nothing bleeding. Capped below the part's remaining health. -->
+					<li Class="RavagerReimagined.BleedingWoundExtension">
+						<wound>Stab</wound>
+						<severity>6</severity>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- leaping charge: strikes when it lands beside the target, then leaps back to its starting cell (returnJump).
+	     Uses charge and skewer's icon (ravager instinct has its own). -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Charge"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_Charge</defName>
+				<label>leaping charge</label>
+				<description>Channels the wild energy of felines to perform a psychic jump that charges into the target, furiously striking it twice, then leaps back to where it started.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_ChargeAndSkewer</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>10</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>1000</cooldownTime>
+				<castSound>AA_SkewerPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>3</level>
+						<order>2</order>
+						<psyfocusCost>0.125</psyfocusCost>
+						<entropyGain>35</entropyGain>
+						<prerequisites>
+							<li>AAVPE_ClawFrenzy</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>10</damage>
+						<armorPenetration>.1</armorPenetration>
+						<jump>true</jump>
+						<returnJump>true</returnJump>
+						<repeatAmount>2</repeatAmount>
+						<mote>AA_Charge</mote>
+						<moteFailed>AA_ChargeFailed</moteFailed>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- EMP blow: level 4 (was 3, swapped with spin cut), after spin cut (was after disabling strike); sets off a small EMP explosion around the target (EmpBurstExtension), a scaled-down static pulse. -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_EmpBlow"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_EmpBlow</defName>
+				<label>EMP blow</label>
+				<description>Strike the target with such powerful psychic energy that it sends an electromagnetic pulse through their body. The discharge bursts outward, hitting everything around the target with EMP. Mechanoids will adapt after one blow.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_EmpBlow</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>1.9</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>1000</cooldownTime>
+				<castSound>Explosion_EMP</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>4</level>
+						<order>3</order>
+						<psyfocusCost>0.05</psyfocusCost>
+						<entropyGain>20</entropyGain>
+						<prerequisites>
+							<li>AAVPE_SpinCut</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>EMP</damageDef>
+						<damage>40</damage>
+						<armorPenetration>1</armorPenetration>
+						<repeatAmount>1</repeatAmount>
+						<mote>AA_EMPBlow</mote>
+						<moteFailed>AA_EMPBlowFailed</moteFailed>
+					</li>
+					<!-- Damage -1 = EMP's default amount, as Staticlord's static pulse uses. Caster and target excluded. -->
+					<li Class="RavagerReimagined.EmpBurstExtension">
+						<radius>3.9</radius>
+						<damageDef>EMP</damageDef>
+						<damage>-1</damage>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- charge and skewer, renamed ravager instinct (defName kept for saves): no longer an attack but a 6-hour self buff
+	     (RavagerReimagined_RavagerInstinct, Common/Defs/RavagerInstinct.xml) applied to the caster through VEF's
+	     AbilityExtension_Hediff. Cooldown 1 day. Same unlocks (leaping charge or skewer). -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_ChargeAndSkewer"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_ChargeAndSkewer</defName>
+				<label>ravager instinct</label>
+				<description>The caster gives itself over to a predator's instinct for 6 hours: it cannot be brought down by pain, takes 25% less damage and deals 25% more melee damage. The hunt is draining: while it lasts, the caster's sleep and hunger fall 30% faster.</description>
+				<iconPath>UI/Abilities/RavagerReimagined/RavagerReimagined_RavagerInstinct</iconPath>
+				<abilityClass>VEF.Abilities.Ability_Blank</abilityClass>
+				<targetMode>Self</targetMode>
+				<range>0</range>
+				<castTime>30</castTime>
+				<cooldownTime>60000</cooldownTime>
+				<durationTime>15000</durationTime>
+				<castSound>AA_SkewerPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>4</level>
+						<order>1</order>
+						<psyfocusCost>0.175</psyfocusCost>
+						<entropyGain>80</entropyGain>
+						<prerequisites>
+							<li>AAVPE_Charge</li>
+							<li>AAVPE_Skewer</li>
+						</prerequisites>
+					</li>
+					<li Class="VEF.Abilities.AbilityExtension_Hediff">
+						<hediff>RavagerReimagined_RavagerInstinct</hediff>
+						<applyToCaster>true</applyToCaster>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- spin cut: level 3 (was 4, swapped with EMP blow), after disabling strikes (was after EMP blow); cast time 120 -> 10;
+	     keeps spinning after the cast (SpinCutExtension): every 2 seconds it cuts every hostile next to the caster, for
+	     10 seconds x psychic sensitivity (durationTime). Damage 25 -> 15 and armor penetration 0.4 -> 0.3: it runs
+	     alongside the caster's own attacks and casts, so it is meant as secondary damage. -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_SpinCut"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_SpinCut</defName>
+				<label>spin cut</label>
+				<description>The caster skips a short distance and spins around, cutting anyone adjacent to the original target. It keeps spinning afterwards, cutting every hostile next to it every 2 seconds. The spin lasts 10 seconds, scaling with psychic sensitivity.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_SpinCut</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>8</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>1000</cooldownTime>
+				<durationTime>600</durationTime>
+				<durationTimeStatFactors>
+					<PsychicSensitivity>1</PsychicSensitivity>
+				</durationTimeStatFactors>
+				<castSound>AA_SpinCutPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>3</level>
+						<order>3</order>
+						<psyfocusCost>0.05</psyfocusCost>
+						<entropyGain>20</entropyGain>
+						<prerequisites>
+														<li>RavagerReimagined_DisablingStrikes</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>15</damage>
+						<armorPenetration>0.3</armorPenetration>
+						<jump>true</jump>
+						<repeatAmount>1</repeatAmount>
+						<mote>AA_SpinCut</mote>
+						<cleave>true</cleave>
+						<cleaveHostileOnly>false</cleaveHostileOnly>
+						<moteFailed>AA_SpinCutFailed</moteFailed>
+					</li>
+					<!-- The repeated spins (hediff in Common/Defs/SpinCut.xml). Each uses the damage above, scaled like the
+					     cast, and only hits standing pawns hostile to the caster. Each spin also throws a swirl of dust (vanilla
+						     TornadoDustPuff) and slash arcs (VPE's Nightstalker VPE_Slash) around the caster. -->
+					<li Class="RavagerReimagined.SpinCutExtension">
+						<hediff>RavagerReimagined_SpinCutting</hediff>
+						<interval>120</interval>
+						<radius>1.9</radius>
+						<fleck>PsycastAreaEffect</fleck>
+						<fleckScale>3</fleckScale>
+						<dustFleck>TornadoDustPuff</dustFleck>
+						<slashFleck>VPE_Slash</slashFleck>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- fatal blow, renamed savage blow (defName kept for saves): no longer an instakill. One 999-damage hit, ignoring
+	     armor, on any random body part (PartStrikeExtension): a finger, a bone, an organ, the spine or the brain.
+	     The strike itself deals 0 (instakill removed). Level 5 order 1, after charge and skewer (was after spin
+	     cut); cooldown 1 day (was 1000 ticks); psyfocus 0.5 -> 0.2. -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_FatalBlow"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_FatalBlow</defName>
+				<label>savage blow</label>
+				<description>Calling upon the latent psychic potentials of wild animals, the caster strikes a random part of the target with such savagery that it is destroyed outright, be it a finger, a bone, an organ, the spine or the brain. Armor offers no protection. Whether the target survives depends on what is lost.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_FatalBlow</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>1.9</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>60000</cooldownTime>
+				<castSound>AA_FatalBlowPsycast</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>5</level>
+						<order>1</order>
+						<psyfocusCost>0.2</psyfocusCost>
+						<entropyGain>75</entropyGain>
+						<prerequisites>
+							<li>AAVPE_ChargeAndSkewer</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>0</damage>
+						<armorPenetration>0</armorPenetration>
+						<repeatAmount>1</repeatAmount>
+						<mote>RavagerReimagined_FatalBlow</mote>
+						<moteFailed>RavagerReimagined_FatalBlowFailed</moteFailed>
+					</li>
+					<li Class="RavagerReimagined.PartStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>999</damage>
+						<ignoreArmor>true</ignoreArmor>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- KO: description reworded (no weapon); after EMP blow (was after charge and skewer); cooldown 3 days (was 1000
+	     ticks); psyfocus 0.3 -> 0.2; only lands on a contested roll (ContestedChanceExtension): 50%, +/-3% per point of Melee the caster has
+	     over or under the target, 1% to 99%. -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_KO"]</xpath>
+		<value>
+			<VEF.Abilities.AbilityDef ParentName="VPE_PsycastBase">
+				<defName>AAVPE_KO</defName>
+				<label>KO</label>
+				<description>Strikes the target with an overcharged pulse of psychic energy that can knock them unconscious, with the goal of leaving no lasting damage.\n\nThe chance is 50%, raised by 3% for every point of Melee skill the caster has over the target and lowered by 3% for every point below (1% to 99%). Animals count as Melee 10; mechanoids use their fixed skill level.</description>
+				<iconPath>UI/Abilities/Ravager/AAVPE_KO</iconPath>
+				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
+				<targetMode>Pawn</targetMode>
+				<range>1.9</range>
+				<targetingParameters>
+					<canTargetPawns>true</canTargetPawns>
+					<canTargetSelf>false</canTargetSelf>
+					<canTargetBuildings>false</canTargetBuildings>
+				</targetingParameters>
+				<castTime>10</castTime>
+				<cooldownTime>180000</cooldownTime>
+				<castSound>Explosion_EMP</castSound>
+				<modExtensions>
+					<li Class="VanillaPsycastsExpanded.AbilityExtension_Psycast">
+						<path>AAVPE_Ravager</path>
+						<level>5</level>
+						<order>3</order>
+						<psyfocusCost>0.2</psyfocusCost>
+						<entropyGain>85</entropyGain>
+						<prerequisites>
+							<li>AAVPE_EmpBlow</li>
+						</prerequisites>
+					</li>
+					<li Class="RavagerReimagined.RavagerStrikeExtension">
+						<damageDef>Cut</damageDef>
+						<damage>0</damage>
+						<armorPenetration>0</armorPenetration>
+						<repeatAmount>1</repeatAmount>
+						<mote>AA_KO</mote>
+						<moteFailed>AA_KOFailed</moteFailed>
+					</li>
+					<li Class="VEF.Abilities.AbilityExtension_Hediff">
+						<hediff>AAVPE_KO</hediff>
+						<durationMultiplier>PsychicSensitivity</durationMultiplier>
+					</li>
+					<li Class="RavagerReimagined.ContestedChanceExtension">
+						<baseChance>0.5</baseChance>
+						<chancePerLevel>0.03</chancePerLevel>
+						<minChance>0.01</minChance>
+						<maxChance>0.99</maxChance>
+						<!-- Animals and other skill-less pawns; mechanoids use their race's fixed skill level. -->
+						<levelWithoutSkills>10</levelWithoutSkills>
+					</li>
+					<li Class="VEF.Abilities.AbilityExtension_FleckOnTarget">
+						<fleckDef>PsycastPsychicEffect</fleckDef>
+						<scale>0.5</scale>
+					</li>
+				</modExtensions>
+			</VEF.Abilities.AbilityDef>
+		</value>
+	</Operation>
+
+	<!-- Leg skip and disabling strike are taken out of the tree by removing their psycast extension. The defs stay
+	     (other mods may still name them). Without the extension VPE no longer lists them in any path or makes
+	     neurotrainers for them, and Psycasts² ignores them. Disabling strike is replaced by the disabling strikes
+	     passive. -->
+	<Operation Class="PatchOperationRemove">
+		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_LegSkip" or defName="AAVPE_DisablingStrike"]/modExtensions/li[@Class="VanillaPsycastsExpanded.AbilityExtension_Psycast"]</xpath>
+	</Operation>
+
+</Patch>

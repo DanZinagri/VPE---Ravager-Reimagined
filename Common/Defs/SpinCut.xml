@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- On the caster after spin cut (AAVPE_SpinCut's SpinCutExtension). Hediff_SpinCut spins at the extension's interval
+	     until the ability's duration runs out, and ends early if the caster goes down. Recasting restarts the timer. -->
+	<HediffDef>
+		<defName>RavagerReimagined_SpinCutting</defName>
+		<label>spin cutting</label>
+		<description>This psycaster is whirling through a psychic spin cut, slashing every enemy that stands next to it.</description>
+		<hediffClass>RavagerReimagined.Hediff_SpinCut</hediffClass>
+		<defaultLabelColor>(1, 0.55, 0.3)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<everCurableByItem>false</everCurableByItem>
+		<makesSickThought>false</makesSickThought>
+	</HediffDef>
+
+</Defs>

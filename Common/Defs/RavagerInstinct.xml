@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Ravager instinct's buff (AAVPE_ChargeAndSkewer, Common/Patches/RavagerAbilities.xml). 6 hours: the ability's
+	     durationTime overrides disappearsAfterTicks, which is kept equal as a fallback.
+	     Pain shock threshold: vanilla caps the stat at 99% (PainShockThreshold maxValue 0.99), so the +100% offset lands
+	     every pawn on the cap. Only pain of 99% or more can still drop the caster. -->
+	<HediffDef>
+		<defName>RavagerReimagined_RavagerInstinct</defName>
+		<label>ravager instinct</label>
+		<description>A predator's instinct has taken over. Pain can no longer bring this creature down, it shrugs off part of every blow and strikes harder, but the hunt burns through its reserves: sleep and hunger fall faster.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<defaultLabelColor>(1, 0.55, 0.3)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<isBad>false</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<makesSickThought>false</makesSickThought>
+		<comps>
+			<li Class="HediffCompProperties_Disappears">
+				<disappearsAfterTicks>15000</disappearsAfterTicks>
+				<showRemainingTime>true</showRemainingTime>
+			</li>
+		</comps>
+		<stages>
+			<li>
+				<hungerRateFactor>1.3</hungerRateFactor>
+				<restFallFactor>1.3</restFallFactor>
+				<statOffsets>
+					<PainShockThreshold>1</PainShockThreshold>
+				</statOffsets>
+				<statFactors>
+					<IncomingDamageFactor>0.75</IncomingDamageFactor>
+					<MeleeDamageFactor>1.25</MeleeDamageFactor>
+				</statFactors>
+			</li>
+		</stages>
+	</HediffDef>
+
+</Defs>

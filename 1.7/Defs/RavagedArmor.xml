@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<!-- Disabling strikes' evolution effect, on the target: -10% worn armor effectiveness per stack, up to 5 stacks
+	     (severity = stacks). Uses Sentinel Framework's VPE_SentinelFramework_ArmorEffectiveness_STNL stat, whose
+	     StatPart multiplies the armor ratings of apparel by the wearer's value. 1.7 only: Sentinel's 1.6 build has
+	     no such stat. Fades one stack every 2 hours. -->
+	<HediffDef>
+		<defName>RavagerReimagined_RavagedArmor</defName>
+		<label>ravaged armor</label>
+		<description>Psychic strikes have found the gaps in this creature's armor. Its worn armor protects less until the effect fades.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<defaultLabelColor>(0.8, 0.35, 0.35)</defaultLabelColor>
+		<initialSeverity>1</initialSeverity>
+		<minSeverity>0</minSeverity>
+		<maxSeverity>5</maxSeverity>
+		<isBad>true</isBad>
+		<scenarioCanAdd>false</scenarioCanAdd>
+		<makesSickThought>false</makesSickThought>
+		<comps>
+			<li Class="HediffCompProperties_SeverityPerDay">
+				<severityPerDay>-12</severityPerDay>
+			</li>
+		</comps>
+		<stages>
+			<li>
+				<label>x1</label>
+				<statFactors><VPE_SentinelFramework_ArmorEffectiveness_STNL>0.9</VPE_SentinelFramework_ArmorEffectiveness_STNL></statFactors>
+			</li>
+			<li>
+				<minSeverity>1.001</minSeverity>
+				<label>x2</label>
+				<statFactors><VPE_SentinelFramework_ArmorEffectiveness_STNL>0.8</VPE_SentinelFramework_ArmorEffectiveness_STNL></statFactors>
+			</li>
+			<li>
+				<minSeverity>2.001</minSeverity>
+				<label>x3</label>
+				<statFactors><VPE_SentinelFramework_ArmorEffectiveness_STNL>0.7</VPE_SentinelFramework_ArmorEffectiveness_STNL></statFactors>
+			</li>
+			<li>
+				<minSeverity>3.001</minSeverity>
+				<label>x4</label>
+				<statFactors><VPE_SentinelFramework_ArmorEffectiveness_STNL>0.6</VPE_SentinelFramework_ArmorEffectiveness_STNL></statFactors>
+			</li>
+			<li>
+				<minSeverity>4.001</minSeverity>
+				<label>x5</label>
+				<statFactors><VPE_SentinelFramework_ArmorEffectiveness_STNL>0.5</VPE_SentinelFramework_ArmorEffectiveness_STNL></statFactors>
+			</li>
+		</stages>
+	</HediffDef>
+
+</Defs>
