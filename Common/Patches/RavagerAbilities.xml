@@ -5,6 +5,8 @@
      own RavagerReimagined.Ability_RavagerStrike (Source/Ability_RavagerStrike.cs), not Alpha Animals' code; only their
      art, sounds and text keys are used. Not compatible with ongoing saves whose pawns already know Ravager psycasts.
      Every value for these psycasts is set here; Alpha Animals' later edits to them do not come through.
+     Strike damage = (damage + unarmedScale x the caster's unarmed strike damage) x Melee/sensitivity multiplier. Flat
+     damage was lowered when the unarmed term was added (2026-11-10); EMP blow keeps its flat EMP damage (unarmedScale 0).
      Generated 2026-10-28 from Alpha Animals' XML; the comment above each ability says what differs from theirs.
 
      Tree (level: order, after):
@@ -19,7 +21,7 @@
      AbilityExtension_Psycast.PrereqsCompleted). -->
 <Patch>
 
-	<!-- savage psychic slice: cast time quartered (120 -> 30). -->
+	<!-- savage psychic slice: cast time quartered (120 -> 30); range 5 x psychic sensitivity. -->
 	<Operation Class="PatchOperationReplace">
 		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Slice"]</xpath>
 		<value>
@@ -31,6 +33,9 @@
 				<abilityClass>RavagerReimagined.Ability_RavagerStrike</abilityClass>
 				<targetMode>Pawn</targetMode>
 				<range>5</range>
+				<rangeStatFactors>
+					<PsychicSensitivity>1</PsychicSensitivity>
+				</rangeStatFactors>
 				<targetingParameters>
 					<canTargetPawns>true</canTargetPawns>
 					<canTargetSelf>false</canTargetSelf>
@@ -49,7 +54,7 @@
 					</li>
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>Cut</damageDef>
-						<damage>20</damage>
+						<damage>12</damage>
 						<armorPenetration>.6</armorPenetration>
 						<teleport>true</teleport>
 						<mote>AA_PsychicSlice</mote>
@@ -94,7 +99,8 @@
 					</li>
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>Scratch</damageDef>
-						<damage>10</damage>
+						<damage>5</damage>
+						<unarmedScale>0.5</unarmedScale>
 						<armorPenetration>.3</armorPenetration>
 						<repeatAmount>3</repeatAmount>
 						<mote>AA_ClawFrenzy</mote>
@@ -139,7 +145,7 @@
 					</li>
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>Stab</damageDef>
-						<damage>30</damage>
+						<damage>20</damage>
 						<armorPenetration>.9</armorPenetration>
 						<repeatAmount>1</repeatAmount>
 						<mote>AA_Skewer</mote>
@@ -189,7 +195,8 @@
 					</li>
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>Cut</damageDef>
-						<damage>10</damage>
+						<damage>5</damage>
+						<unarmedScale>0.5</unarmedScale>
 						<armorPenetration>.1</armorPenetration>
 						<jump>true</jump>
 						<returnJump>true</returnJump>
@@ -236,6 +243,7 @@
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>EMP</damageDef>
 						<damage>40</damage>
+						<unarmedScale>0</unarmedScale>
 						<armorPenetration>1</armorPenetration>
 						<repeatAmount>1</repeatAmount>
 						<mote>AA_EMPBlow</mote>
@@ -331,7 +339,8 @@
 					</li>
 					<li Class="RavagerReimagined.RavagerStrikeExtension">
 						<damageDef>Cut</damageDef>
-						<damage>15</damage>
+						<damage>8</damage>
+						<unarmedScale>0.5</unarmedScale>
 						<armorPenetration>0.3</armorPenetration>
 						<jump>true</jump>
 						<repeatAmount>1</repeatAmount>

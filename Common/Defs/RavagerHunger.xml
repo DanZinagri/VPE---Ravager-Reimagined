@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-	<!-- Level 4, between ravager instinct and EMP blow; unlocked by skewer. A scaled 30-damage bite
+	<!-- Level 4, between ravager instinct and EMP blow; unlocked by skewer. A 20-damage bite plus the caster's unarmed strike
 	     (Ability_RavagerStrike, so Melee x psychic sensitivity scaling and disabling strikes apply). Biting
 	     a flesh creature also feeds the caster 1 nutrition and gives it the sated buff below (FeedOnHitExtension).
 	     Cooldown 6 hours. -->
@@ -34,7 +34,7 @@
 			</li>
 			<li Class="RavagerReimagined.RavagerStrikeExtension">
 				<damageDef>Bite</damageDef>
-				<damage>30</damage>
+				<damage>20</damage>
 				<armorPenetration>0.3</armorPenetration>
 				<repeatAmount>1</repeatAmount>
 				<mote>RavagerReimagined_RavagerHunger</mote>

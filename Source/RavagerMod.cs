@@ -65,8 +65,9 @@ namespace RavagerReimagined
     {
         public static RavagerSettings settings;
 
-        // Example casts shown under the sliders: savage psychic slice (20) and skewer (30).
-        private static readonly (string label, float damage)[] examples = { ("Savage psychic slice", 20f), ("Skewer", 30f) };
+        // Example casts shown under the sliders: savage psychic slice and skewer, flat damage plus a baseline human fist
+        // (8.2) as their unarmed strike.
+        private static readonly (string label, float damage)[] examples = { ("Savage psychic slice", 12f + 8.2f), ("Skewer", 20f + 8.2f) };
         private static readonly (int skill, float sensitivity)[] exampleCasters = { (0, 1f), (10, 1f), (20, 1f), (20, 2f), (20, 3f) };
 
         public RavagerMod(ModContentPack content) : base(content)
@@ -99,7 +100,7 @@ namespace RavagerReimagined
             settings.sensitivityWeight = Snap(list.Slider(settings.sensitivityWeight, 0f, 2f));
             list.GapLine();
 
-            list.Label("Examples (damage per hit):");
+            list.Label("Examples (damage per hit, with a plain human fist as the unarmed strike):");
             foreach ((string label, float damage) in examples)
             {
                 string line = label + ":";

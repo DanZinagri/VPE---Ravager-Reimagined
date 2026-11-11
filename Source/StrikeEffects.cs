@@ -12,9 +12,45 @@ namespace RavagerReimagined
     // passive rolls, and a guaranteed-bleed psycast makes sure a wound bleeds.
     public static class RavagerStrike
     {
+        // (flat damage + unarmedScale x the caster's unarmed strike) x the Melee/sensitivity multiplier. A flat damage of 0
+        // marks a psycast that deals no strike damage (KO, savage blow) and stays 0.
         public static float Damage(Pawn caster, RavagerStrikeExtension strike)
         {
-            return strike.damage > 0f ? strike.damage * RavagerMod.settings.Multiplier(caster) : 0f;
+            if (strike.damage <= 0f)
+            {
+                return 0f;
+            }
+            float total = strike.damage + strike.unarmedScale * UnarmedStrikeDamage(caster);
+            return total * RavagerMod.settings.Multiplier(caster);
+        }
+
+        // The damage of the caster's hardest-hitting natural attack (fists, bite, claws, and implant weapons such as power
+        // claws), as vanilla melee would deal it: part efficiency, life stage, melee damage factor and savage style's
+        // unarmed bonus (which only counts while no weapon is held) are all included. 0 if the caster has none.
+        public static float UnarmedStrikeDamage(Pawn caster)
+        {
+            float best = 0f;
+            Consider(caster, caster.verbTracker?.AllVerbs, ref best);
+            foreach (HediffComp_VerbGiver giver in caster.health.hediffSet.GetHediffComps<HediffComp_VerbGiver>())
+            {
+                Consider(caster, giver.VerbTracker?.AllVerbs, ref best);
+            }
+            return best;
+        }
+
+        private static void Consider(Pawn caster, List<Verb> verbs, ref float best)
+        {
+            if (verbs == null)
+            {
+                return;
+            }
+            foreach (Verb verb in verbs)
+            {
+                if (verb.IsMeleeAttack && verb.IsStillUsableBy(caster))
+                {
+                    best = Mathf.Max(best, verb.verbProps.AdjustedMeleeDamageAmount(verb, caster));
+                }
+            }
         }
 
         public static List<BodyPartRecord> PartsFor(Pawn target, BodyPartDef only)

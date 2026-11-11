@@ -7,12 +7,15 @@ using Ability = VEF.Abilities.Ability;
 
 namespace RavagerReimagined
 {
-    // How a Ravager strike lands. Damage is scaled by RavagerSettings.Multiplier (Melee skill x psychic sensitivity);
+    // How a Ravager strike lands. Damage is flat damage plus a share of the caster's unarmed strike, scaled by
+    // RavagerSettings.Multiplier (Melee skill x psychic sensitivity);
     // a damage of 0 strikes for nothing, for psycasts whose effect is elsewhere (KO's hediff, savage blow's part strike).
     public class RavagerStrikeExtension : DefModExtension
     {
         public DamageDef damageDef;
         public float damage;
+        // Share of the caster's unarmed strike damage (RavagerStrike.UnarmedStrikeDamage) added to every hit.
+        public float unarmedScale = 1f;
         public float armorPenetration;
         public int repeatAmount = 1;
         // Only parts of this def are hit; any non-missing part when null.
