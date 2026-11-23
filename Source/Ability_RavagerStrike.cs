@@ -3,6 +3,7 @@ using System.Linq;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
+using Verse.AI;
 using Ability = VEF.Abilities.Ability;
 
 namespace RavagerReimagined
@@ -30,6 +31,10 @@ namespace RavagerReimagined
         public bool cleave;
         public float cleaveRadius = 1.9f;
         public bool cleaveHostileOnly = true;
+
+        // After the strike, a player-controlled caster is ordered to melee-attack the target (spin cut: keep fighting while
+        // the spin runs). VEF ends the caster's current job, any attack order included, before every cast.
+        public bool attackAfter;
 
         // Language keys for the text thrown over the target (success) or the caster (failure).
         public string mote;
@@ -135,6 +140,31 @@ namespace RavagerReimagined
                 MoteMaker.ThrowText(center.ToVector3Shifted(), map, key.Translate(), 3f);
             }
             contestFailed = false;
+            if (strike.attackAfter)
+            {
+                AttackTarget(target);
+            }
+        }
+
+        // attackAfter: order a melee attack on the target while it is still a standing hostile. Inside the cast job (a strike
+        // that resolves during the cast) the attack is queued to follow it; after a leap the cast job is already over.
+        private void AttackTarget(Pawn target)
+        {
+            if (!pawn.Spawned || !pawn.IsColonistPlayerControlled || pawn.Downed || target == null || !target.Spawned
+                || target.Dead || target.Downed || !target.HostileTo(pawn))
+            {
+                return;
+            }
+            Job attack = JobMaker.MakeJob(JobDefOf.AttackMelee, target);
+            attack.playerForced = true;
+            if (pawn.jobs.curDriver is VEF.Abilities.JobDriver_CastAbilityOnce)
+            {
+                pawn.jobs.jobQueue.EnqueueFirst(attack);
+            }
+            else
+            {
+                pawn.jobs.TryTakeOrderedJob(attack);
+            }
         }
 
         private void Fail()
@@ -171,6 +201,19 @@ namespace RavagerReimagined
             }
             Map map = pawn.Map;
             IntVec3 origin = pawn.Position;
+            // Already standing beside the target: strike in place rather than hopping on the spot.
+            if (landing == origin)
+            {
+                Resolve(target);
+                return;
+            }
+            // Vanilla MakeFlyer only ends its own CastJump job. Any other job (VEF's cast job, which is running this Cast)
+            // is suspended and resumed on landing, which recast the psycast and leapt again in a loop. Ending it here is
+            // safe: nothing in VEF's cast toil touches the job after Cast returns.
+            if (pawn.CurJob != null)
+            {
+                pawn.jobs.EndCurrentJob(JobCondition.Succeeded, startNewJob: false);
+            }
             if (!(PawnFlyer.MakeFlyer(RavagerLeap.FlyerDef, pawn, landing, null, null) is RavagerLeap leap))
             {
                 Fail();

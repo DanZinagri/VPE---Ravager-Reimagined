@@ -302,7 +302,8 @@
 	<!-- spin cut: level 3 (was 4, swapped with EMP blow), after disabling strikes (was after EMP blow); cast time 120 -> 10;
 	     keeps spinning after the cast (SpinCutExtension): every 2 seconds it cuts every hostile next to the caster, for
 	     10 seconds x psychic sensitivity (durationTime). Damage 25 -> 15 and armor penetration 0.4 -> 0.3: it runs
-	     alongside the caster's own attacks and casts, so it is meant as secondary damage. -->
+	     alongside the caster's own attacks and casts, so it is meant as secondary damage. attackAfter: a player's caster
+	     goes straight into melee on the target after the strike. -->
 	<Operation Class="PatchOperationReplace">
 		<xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_SpinCut"]</xpath>
 		<value>
@@ -345,6 +346,7 @@
 						<jump>true</jump>
 						<repeatAmount>1</repeatAmount>
 						<mote>AA_SpinCut</mote>
+						<attackAfter>true</attackAfter>
 						<cleave>true</cleave>
 						<cleaveHostileOnly>false</cleaveHostileOnly>
 						<moteFailed>AA_SpinCutFailed</moteFailed>
