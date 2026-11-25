@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ability AI rules (saintwacko.AbilityAI) for the reworked Ravager path. This folder only loads when Ability AI is
+     active. Ability AI ships its own rules for the original Ravager psycasts; About.xml loads this mod after Ability AI,
+     so the whole-def replaces in Common/Patches/RavagerAbilities.xml wipe those, and these rules are added after the
+     replaces (loadFolders lists this folder before Common: patch files of the last-listed folder are applied first).
+     Hediffs given through VEF's AbilityExtension_Hediff are read by Ability AI itself: a self buff is not recast while
+     it lasts, and KO skips a pawn already knocked out. requires Melee means "not wielding a ranged weapon", so an
+     unarmed caster counts. No rule: disabling strikes (a passive). -->
+<Patch>
+
+  <!-- Savage psychic slice: skips beside a pawn within 5 (x psychic sensitivity) and cuts it. 5% psyfocus: the
+       everyday opener. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Slice"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>2</priority>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Savage style: 4 hours of extra unarmed damage. Only for a caster not holding a ranged weapon, with an enemy
+       within 10; not recast while savage fury lasts. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="RavagerReimagined_SavageStyle"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_SelfBuff</workerClass>
+        <priority>3</priority>
+        <requires>Melee</requires>
+        <maxRange>10</maxRange>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Claw frenzy: three scratches on a pawn beside the caster. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_ClawFrenzy"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>2</priority>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Skewer: a stab on a pawn beside the caster that always leaves a bleeding wound. Mechs don't bleed, so flesh
+       targets only (the original rule was humanlikes only, for the torso-only skewer). -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Skewer"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>3</priority>
+        <targetKinds>Humanlike, Animal</targetKinds>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Leaping charge: leaps onto a pawn within 10, strikes twice, leaps back. A hit and run, so not at a pawn within
+       3: the strikes beside the caster are cheaper there. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_Charge"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>3</priority>
+        <minRange>3</minRange>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Spin cut: leaps beside a pawn within 8 and cuts it and every pawn within 1.9 of it, the caster's own side
+       included (never the caster). Then keeps spinning for 10 s x sensitivity, cutting only hostiles beside the caster,
+       so one enemy is worth it; groups are preferred. Never with an ally within 1.9 of the target, and not recast
+       while the caster is still spinning. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_SpinCut"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>4</priority>
+        <radius>1.9</radius>
+        <preferGrouped>true</preferGrouped>
+        <avoidAllies>true</avoidAllies>
+        <casterLeaves>true</casterLeaves>
+        <unlessCasterHas>RavagerReimagined_SpinCutting</unlessCasterHas>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Ravager instinct: 6 hours of pain immunity, -25% damage taken and +25% melee damage, on a 1-day cooldown. For a
+       real fight: three enemies within 15, the nearest within 10, and no ranged weapon in hand. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_ChargeAndSkewer"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_SelfBuff</workerClass>
+        <priority>5</priority>
+        <requires>Melee</requires>
+        <maxRange>10</maxRange>
+        <radius>15</radius>
+        <auraKinds>All</auraKinds>
+        <auraMin>3</auraMin>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Ravager hunger: a bite on a pawn beside the caster. Feeds the caster and gives it the sated buff only off a
+       flesh creature, so humanlikes and animals. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="RavagerReimagined_RavagerHunger"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>3</priority>
+        <targetKinds>Humanlike, Animal</targetKinds>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- EMP blow: an EMP hit on a pawn beside the caster plus an EMP burst within 3.9 of it (caster and target
+       excluded). Mechs only, and never with one of the caster's side's mechs in the burst. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_EmpBlow"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>4</priority>
+        <targetKinds>Mechanoid</targetKinds>
+        <radius>3.9</radius>
+        <avoidAllies>true</avoidAllies>
+        <allyKinds>Mechanoid</allyKinds>
+        <casterLeaves>true</casterLeaves>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Savage blow: destroys one random part of a pawn beside the caster, which may kill it. One-day cooldown; other
+       factions only with the Maiming setting, and never at a pawn a faction-mate is casting it at. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_FatalBlow"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>5</priority>
+        <exclusive>true</exclusive>
+        <npcGate>Maiming</npcGate>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- KO: a contested chance to knock a pawn beside the caster unconscious, no injury. Harmless, so it may also put
+       down an ally in a hostile break. Skips a pawn already knocked out and one a faction-mate is casting at. -->
+  <Operation Class="PatchOperationAddModExtension">
+    <xpath>Defs/VEF.Abilities.AbilityDef[defName="AAVPE_KO"]</xpath>
+    <value>
+      <li Class="AbilityAI.AbilityAIExtension">
+        <workerClass>AbilityAI.AbilityAIWorker_TargetHostile</workerClass>
+        <priority>3</priority>
+        <hediff>AAVPE_KO</hediff>
+        <harmless>true</harmless>
+        <exclusive>true</exclusive>
+      </li>
+    </value>
+  </Operation>
+
+</Patch>
